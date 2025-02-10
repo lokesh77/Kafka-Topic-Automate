@@ -1,0 +1,29 @@
+
+# Create Multiple Kafka Topic using Python
+
+# default image only for jobs without image set
+image:  $docker_image_path/alpine/git:v2.30.1
+
+.shared_scm_runner_medium3:
+  tags:
+    - scm-eks-shared-medium3
+
+variables:
+  PARTITIONS: 3  # Set your desired number of partitions
+  REPLICATION: 2  # Set your desired replication factor
+
+
+kafka_topic_creation:
+  extends: [ .shared_scm_runner_medium3 ]
+  image: docker.com/customimages/scm/python-gitlab-alpine:3.11.9-4.4.0-3.18.6-2
+  cache:
+    key: "${CI_PROJECT_PATH_SLUG}"
+    paths:
+      - .cache/pip
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  before_script:
+    - pip install --upgrade pip
+    - pip install requests
+  script:
+    - python kafka-create-topic.py
